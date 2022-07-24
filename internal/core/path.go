@@ -336,7 +336,8 @@ func (pa *path) hasStaticSource() bool {
 		strings.HasPrefix(pa.conf.Source, "rtsps://") ||
 		strings.HasPrefix(pa.conf.Source, "rtmp://") ||
 		strings.HasPrefix(pa.conf.Source, "http://") ||
-		strings.HasPrefix(pa.conf.Source, "https://")
+		strings.HasPrefix(pa.conf.Source, "https://") ||
+		pa.conf.Source == "rpicamera"
 }
 
 func (pa *path) hasOnDemandStaticSource() bool {
@@ -726,6 +727,12 @@ func (pa *path) staticSourceCreate() {
 			pa.ctx,
 			pa.conf.Source,
 			pa.conf.SourceFingerprint,
+			&pa.sourceStaticWg,
+			pa)
+
+	case pa.conf.Source == "rpicamera":
+		pa.source = newRPICameraSource(
+			pa.ctx,
 			&pa.sourceStaticWg,
 			pa)
 	}

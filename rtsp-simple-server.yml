@@ -173,6 +173,7 @@ paths:
     # * http://existing-url/stream.m3u8 -> the stream is pulled from another HLS server
     # * https://existing-url/stream.m3u8 -> the stream is pulled from another HLS server with HTTPS
     # * redirect -> the stream is provided by another path or server
+    # * rpicamera -> the stream is provided by a Raspberry Pi Camera
     source: publisher
 
     # If the source is an RTSP or RTSPS URL, this is the protocol that will be used to

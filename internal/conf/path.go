@@ -165,6 +165,8 @@ func (pconf *PathConf) checkAndFillMissing(conf *Conf, name string) error {
 			return fmt.Errorf("'%s' is not a valid RTSP URL", pconf.SourceRedirect)
 		}
 
+	case pconf.Source == "rpicamera":
+
 	default:
 		return fmt.Errorf("invalid source: '%s'", pconf.Source)
 	}

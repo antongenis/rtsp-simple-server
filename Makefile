@@ -278,3 +278,46 @@ dockerhub:
 
 	docker buildx rm builder
 	rm -rf $$HOME/.docker/manifests/*
+
+define DOCKERFILE_RPI
+FROM golang:1.18
+
+RUN dpkg --add-architecture armel \
+	&& apt update && apt install -y --no-install-recommends \
+	gcc-arm-linux-gnueabi \
+	g++-arm-linux-gnueabi \
+	libc6-dev:armel \
+	cmake
+
+# https://github.com/raspberrypi/userland/issues/615
+
+RUN cd / && git clone https://github.com/raspberrypi/userland \
+	&& cd /userland \
+	&& git checkout 54fd97a \
+	&& mkdir -p build \
+	&& cd build \
+	&& cmake .. \
+	&& make -j$(nproc) \
+	&& make install
+
+WORKDIR /s
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+RUN CGO_ENABLED=1 \
+	GOOS=linux \
+	GOARCH=arm \
+	GOARM=6 \
+	CC=arm-linux-gnueabi-gcc \
+	CXX=arm-linux-gnueabi-g++ \
+	go build -o /out .
+
+endef
+export DOCKERFILE_RPI
+
+rpi:
+	echo "$$DOCKERFILE_RPI" | docker build . -f - -t temp
+	docker run --rm -it -v $(PWD):/o temp sh -c "mv /out /o/rtsp-simple-server-rpi"
